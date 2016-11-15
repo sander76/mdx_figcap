@@ -14,6 +14,7 @@ from __future__ import unicode_literals
 from markdown.extensions import Extension
 from markdown.inlinepatterns import ImagePattern, IMAGE_LINK_RE
 from markdown.util import etree
+import re
 
 
 class FigureCaptionExtension(Extension):
@@ -27,12 +28,15 @@ class FigureCaptionPattern(ImagePattern):
         image = ImagePattern.handleMatch(self, m)
         title = image.get('title')
         if title:
-            figure = etree.Element('figure')
+            span = etree.Element('span')
+            figure = etree.SubElement(span, 'figure')
             figure.append(image)
-            etree.SubElement(figure, 'figcaption').text = title
-            return figure
+            caption = etree.SubElement(figure, 'figcaption')
+            caption.text = title
+            return span
         else:
             return image
+
 
 def makeExtension(*args, **kwargs):
     return FigureCaptionExtension(*args, **kwargs)
